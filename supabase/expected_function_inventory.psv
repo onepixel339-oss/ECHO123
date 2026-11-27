@@ -1,0 +1,37 @@
+-- ECHO — expected function inventory (checked-in; the X-5 CI diff source).
+-- One row per sync function: (schema, proname, security_definer, owner,
+-- execute_grantees, search_path). The database view
+-- public.v_sync_function_inventory must equal this set EXACTLY — any
+-- function present but absent here, or drifted on any attribute, fails CI.
+--
+-- Owner expectation: the migration role (`postgres` on hosted Supabase and
+-- the CI/local environments — the documented platform behavior, PATCH1
+-- §3.3.7 Option B).
+--
+-- format: schema|proname|security_definer|owner|execute_grantees|search_path
+
+public|sync_init_profile|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_device_register|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_device_list|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_device_revoke|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_device_rename|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_pull|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_push|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_bootstrap_status|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_bootstrap_manifest|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_bootstrap_page|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_bootstrap_ack|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_status|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_conflict_resolve|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_keep_local|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+public|sync_restore_backup|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+echo_jobs|sync_job_compact|t|echo_jobs_admin|service_role|search_path=pg_catalog, echo_data
+echo_jobs|sync_job_cleanup|t|echo_jobs_admin|service_role|search_path=pg_catalog, echo_data
+echo_jobs|sync_job_reset|t|echo_jobs_admin|service_role|search_path=pg_catalog, echo_data
+echo_data|user_key|f|postgres|authenticated,echo_jobs_admin|search_path=pg_catalog
+echo_data|current_watermark|f|postgres|authenticated,echo_jobs_admin|search_path=pg_catalog, echo_data, auth
+echo_data|current_head|f|postgres|authenticated,echo_jobs_admin|search_path=pg_catalog, echo_data
+echo_data|current_epoch|f|postgres|authenticated,echo_jobs_admin|search_path=pg_catalog, echo_data
+echo_data|sanitize_record|f|postgres|authenticated,echo_jobs_admin|search_path=pg_catalog
+echo_data|build_snapshot|f|postgres|authenticated|search_path=pg_catalog, echo_data, auth
+echo_data|assert_change_log_lock|f|postgres|authenticated,echo_jobs_admin|search_path=pg_catalog, echo_data
