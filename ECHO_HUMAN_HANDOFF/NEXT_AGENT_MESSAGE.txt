@@ -1,0 +1,22 @@
+I completed the manual actions in ECHO_HUMAN_HANDOFF:
+
+1. The GitHub package was imported: <repository URL>. The Actions CI run
+   finished <green / red — if red, the failing job's log is attached>.
+   File count compared to TREE_MANIFEST.txt: <matched / paste the diff>.
+2. Supabase project created. Project reference: <paste $PROJECT_REF here —
+   NOT secret>. Region: eu-central-1. Migrations 0000-0007 applied in
+   order; the function inventory matched expected_function_inventory.psv
+   (<yes / paste the mismatch if no>).
+3. Username + password auth configured (Email provider ON, both
+   confirmations OFF, anonymous ON, everything else OFF). The hosted
+   verification from USERNAME_AUTH_SETUP.md: <all steps passed / paste
+   exactly which step behaved differently>.
+4. Environment variables entered in the hosting provider (staging URL:
+   <paste the staging URL if deployed>).
+5. A3 results: <attached 08_RESULTS_TEMPLATE.md with real numbers / not
+   yet — still collecting>.
+
+Please verify everything end-to-end (imported-repo fidelity, CI, hosted
+migrations, RLS, the username auth round-trip, sync flows, staging
+checks), update EXECUTION_STATUS.md, and continue from where the plan left
+off. Do not restart completed stages.
