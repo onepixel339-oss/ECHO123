@@ -58,9 +58,9 @@ if [ -f .env.example ] && [ ! -f ECHO_HUMAN_HANDOFF/.env.example ]; then
   cp .env.example ECHO_HUMAN_HANDOFF/.env.example
 fi
 
-if ! git fetch -q --depth=3 origin "$BRANCH"; then
+if ! git fetch -q --depth=10 origin "$BRANCH"; then
   sleep 5
-  git fetch -q --depth=3 origin "$BRANCH"
+  git fetch -q --depth=10 origin "$BRANCH"
 fi
 git show "$PRISTINE_PKG_COMMIT:package.json" > package.json
 
