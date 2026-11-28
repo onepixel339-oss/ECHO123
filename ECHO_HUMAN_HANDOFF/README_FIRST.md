@@ -21,11 +21,13 @@ every credential is typed directly into the provider's own dashboard.*
 - **What is genuinely yours to do now** (details + success checks in
   `EXACT_OWNER_ACTIONS.md`):
 
-  1. **Import the GitHub package** into a clean repository (bundle or
-     source archive — `GITHUB_MANUAL_IMPORT.md`, 10 min).
-  2. **Confirm the real GitHub Actions run** passes (the workflow has
-     never run on GitHub yet — CI is local-verified only).
-  3. **Create the Supabase project** and apply the 8 migrations (10 min).
+  1. **GitHub repository recovery and PR #1 merge** — completed in
+     `onepixel339-oss/ECHO123`; the `main` branch is the canonical remote.
+  2. **GitHub Actions CI** — completed successfully for quality, build,
+     syncdb, and E2E (32 Playwright tests).
+  3. **Create the Supabase project** and apply the 9 migrations in numeric
+     order (the project-creation step is owner-held; hosted security checks
+     still need to be recorded).
   4. **Configure username + password auth** in Supabase Auth (5 min — this
      replaces the old Google OAuth step; there is NO Google client to
      create anymore).
@@ -57,7 +59,7 @@ every credential is typed directly into the provider's own dashboard.*
 | `FILES_TO_UPLOAD_OR_APPLY.md` | Migration order + what NOT to commit |
 | `SUPABASE_SETUP.md` | Project settings, migration execution, RLS verification |
 | `CLOUDFLARE_SETUP.md` | Staging deployment (later, after the GitHub import) |
-| `MIGRATIONS/` | The 8 versioned SQL migrations (with the expected-function inventory) |
+| `MIGRATIONS/` | The 9 versioned SQL migrations (with the expected-function inventory) |
 | `A3_USER_TEST_KIT/` | The bilingual validation kit for your participants |
 | `.env.example` | Placeholders only — copy to `.env` / hosting env vars |
 | `HANDOFF_MANIFEST.txt` | SHA-256 inventory of this package |
