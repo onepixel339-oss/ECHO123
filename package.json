@@ -2,14 +2,14 @@
   "name": "echo",
   "version": "1.3.0",
   "private": true,
-  "description": "ECHO — Your taste, mapped. A local-first atlas of your media taste across anime, manga, movies, series, games, books and comics.",
+  "description": "ECHO \u2014 Your taste, mapped. A local-first atlas of your media taste across anime, manga, movies, series, games, books and comics.",
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "bash scripts/reconcile-tree.sh && next build",
-    "build:standalone": "bash scripts/reconcile-tree.sh && next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
+    "build": "next build",
+    "build:standalone": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
     "start": "next start -p 3000",
     "start:standalone": "NODE_ENV=production bun .next/standalone/server.js",
-    "lint": "bash scripts/reconcile-tree.sh && eslint .",
+    "lint": "eslint .",
     "test": "bun test lib/echo/__tests__",
     "icons": "bun run scripts/generate-icons.ts",
     "typecheck": "tsc --noEmit",
@@ -20,7 +20,7 @@
     "cost-table": "bun scripts/cost-table.ts",
     "cost-table:check": "bun scripts/cost-table.ts --check",
     "perf-baseline": "bun scripts/perf-baseline.ts",
-    "test:syncdb": "bash scripts/reconcile-tree.sh && bun run supabase/local/run.ts"
+    "test:syncdb": "bun run supabase/local/run.ts"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.15",
