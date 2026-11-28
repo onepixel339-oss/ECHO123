@@ -310,6 +310,7 @@ describe("GET /api/health", () => {
     const data = JSON.parse(text);
     expect(data.integrations.rawg).toBe(true);
     expect(data.integrations.trakt).toBe(false);
+    delete process.env.NEXT_PUBLIC_RAWG_API_KEY;
   });
 
   test("user provider toggles are honoured in the gate view", async () => {
