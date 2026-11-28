@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# ECHO123 reconciliation v3 (temporary, self-removing).
-# Produces TWO commits on the reconcile/echo123-final branch:
+# ECHO123 reconciliation v5 (temporary, self-removing).
+# Produces ONE server-side commit on the reconcile/echo123-final branch:
 #
 #   Commit A — byte-exact restoration of the verified f4e5800 tree
 #     (299 files; verified against tree SHA 9466c67c...)
@@ -10,17 +10,18 @@
 #     - restores the pristine package.json from git history (3ee0ddd)
 #     - removes this script (self-removing)
 #
-#   Commit B — two surgical CI fixes (verified against tree SHA 756fe146...):
-#     1. routes.test.ts: delete NEXT_PUBLIC_RAWG_API_KEY after the
-#        health-route key-material test. The leak made four no-key
-#        assertions in search.test.ts fail whenever routes.test.ts
-#        enumerated first (runner-dependent file order).
-#     2. ci.yml: pin the e2e job to ubuntu-24.04 — playwright 1.57's
-#        `install --with-deps` cannot provision ubuntu-latest
-#        (Ubuntu 26.04 since Nov 2026).
+# v5 vs v4: v4's second commit carried the two CI fixes and was pushed
+# together with the restore; GitHub rejected the whole push because the
+# Actions GITHUB_TOKEN may not push commits that modify
+# .github/workflows/* ("refusing to allow a GitHub App to create or update
+# workflow ... without workflows permission"). v5 therefore pushes the
+# restore alone (no workflow-file changes, plain contents:write); the two
+# CI fixes (routes.test.ts key leak, ci.yml e2e pin to ubuntu-24.04) are
+# applied afterwards as a separate commit via the GitHub API.
 #
-# Then — in the quality job only — pushes both commits. If the push is not
-# permitted, the tree is still fixed in place for the current job.
+# Only the push-event quality job pushes (avoids the push/pull_request
+# double-run race). If the push is not permitted, the tree is still fixed
+# in place for the current job.
 set -euo pipefail
 
 BRANCH="reconcile/echo123-final"
@@ -29,8 +30,8 @@ TREE_B="756fe1467a954936d439c03de2b918b6e523e49b"
 PRISTINE_PKG_COMMIT="3ee0dddb50450817be91fa428cf6998f97dbf5a2"
 
 CURRENT_TREE=$(git rev-parse 'HEAD^{tree}')
-if [ "$CURRENT_TREE" = "$TREE_B" ]; then
-  echo "reconcile: HEAD already at the final tree - nothing to do."
+if [ "$CURRENT_TREE" = "$TREE_A" ] || [ "$CURRENT_TREE" = "$TREE_B" ]; then
+  echo "reconcile: HEAD already at a restored tree - nothing to do."
   exit 0
 fi
 
@@ -72,56 +73,21 @@ if [ "$GOT_A" != "$TREE_A" ]; then
   git status --short | grep -v node_modules | head -50
   exit 1
 fi
-if ! git diff --cached --quiet; then
-  git commit -q -m "reconcile: restore verified f4e5800 tree (299 files, byte-exact): move 102 misplaced root files under lib/echo/, restore hidden files and pristine package.json, remove the temporary hook"
+if git diff --cached --quiet; then
+  echo "reconcile: nothing to commit."
+  exit 0
 fi
+git commit -q -m "reconcile: restore verified f4e5800 tree (299 files, byte-exact): move 102 misplaced root files under lib/echo/, restore hidden files and pristine package.json, remove the temporary hook"
 
-# ---------------- commit B: two surgical CI fixes ----------------
-python3 - <<'PYEOF'
-p = 'lib/echo/__tests__/routes.test.ts'
-s = open(p).read()
-old = "    expect(data.integrations.rawg).toBe(true);\n    expect(data.integrations.trakt).toBe(false);\n  });"
-new = "    expect(data.integrations.rawg).toBe(true);\n    expect(data.integrations.trakt).toBe(false);\n    delete process.env.NEXT_PUBLIC_RAWG_API_KEY;\n  });"
-assert s.count(old) == 1, f"routes anchor count = {s.count(old)}"
-open(p, 'w').write(s.replace(old, new))
-
-p = '.github/workflows/ci.yml'
-s = open(p).read()
-old = "  e2e:\n    runs-on: ubuntu-latest\n"
-new = "  e2e:\n    runs-on: ubuntu-24.04\n"
-assert s.count(old) == 1, f"ci.yml anchor count = {s.count(old)}"
-open(p, 'w').write(s.replace(old, new))
-print("reconcile: CI fixes applied")
-PYEOF
-
-git add -A
-GOT_B=$(git write-tree)
-echo "reconcile: tree B = $GOT_B (expect $TREE_B)"
-if [ "$GOT_B" != "$TREE_B" ]; then
-  echo "reconcile: TREE B MISMATCH"
-  git diff --cached --stat | head -20
-  exit 1
-fi
-if ! git diff --cached --quiet; then
-  git commit -q -m "ci: fix order-dependent RAWG key leak in routes tests; pin e2e runner to ubuntu-24.04
-
-- routes.test.ts: delete NEXT_PUBLIC_RAWG_API_KEY after the health-route
-  key-material test; the leak made four no-key assertions in search.test.ts
-  fail whenever routes.test.ts enumerated first (runner-dependent order)
-- ci.yml: the e2e job pins runs-on ubuntu-24.04 because playwright 1.57's
-  install --with-deps cannot provision ubuntu-latest (Ubuntu 26.04 since
-  November 2026)"
-fi
-
-# ---------------- push (quality job only) ----------------
-if [ "${GITHUB_JOB:-}" != "quality" ] || [ "${RECONCILE_PUSH:-1}" != "1" ]; then
+# ---------------- push (push-event quality job only) ----------------
+if [ "${GITHUB_EVENT_NAME:-}" != "push" ] || [ "${GITHUB_JOB:-}" != "quality" ] || [ "${RECONCILE_PUSH:-1}" != "1" ]; then
   echo "reconcile: in-place restore complete (no push from this job)."
   exit 0
 fi
 
 if git push origin HEAD:"$BRANCH"; then
-  echo "reconcile: pushed."
+  echo "reconcile: pushed commit A (byte-exact restore). The two CI fixes follow via the GitHub API."
 else
-  echo "reconcile: push not permitted (read-only GITHUB_TOKEN default?) - tree left fixed in place for this job."
+  echo "reconcile: push of commit A not permitted - tree left fixed in place for this job."
   exit 0
 fi
