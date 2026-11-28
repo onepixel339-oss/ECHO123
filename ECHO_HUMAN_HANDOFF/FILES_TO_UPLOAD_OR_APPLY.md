@@ -12,9 +12,14 @@
 | 6 | `MIGRATIONS/0005_jobs.sql` | the S-2 definer jobs |
 | 7 | `MIGRATIONS/0006_views_assertions.sql` | views + trigger + assertions |
 | 8 | `MIGRATIONS/0007_reason_constraint.sql` | the §5.3.4 constraint migration |
+| 9 | `MIGRATIONS/0008_inventory_view_security_invoker.sql` | sets the inventory view to SECURITY INVOKER |
 
-Each migration ends with its own ownership/shape assertion — if any raises
-an error, STOP and send the error to the agent (do not "fix" the SQL).
+The same nine-file chain is mirrored under `supabase/migrations/` for
+repository-native Supabase workflows. Apply each migration only once.
+
+If any migration raises an error, STOP and send the error to the agent (do
+not "fix" the SQL). The final inventory view must also report
+`security_invoker=true`.
 
 ## Reference only (no upload needed)
 
