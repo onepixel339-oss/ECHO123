@@ -4,8 +4,9 @@ I completed the manual actions in ECHO_HUMAN_HANDOFF:
    finished <green / red — if red, the failing job's log is attached>.
    File count compared to TREE_MANIFEST.txt: <matched / paste the diff>.
 2. Supabase project created. Project reference: <paste $PROJECT_REF here —
-   NOT secret>. Region: eu-central-1. Migrations 0000-0007 applied in
-   order; the function inventory matched expected_function_inventory.psv
+   NOT secret>. Region: eu-central-1. Migrations 0000-0007 applied in order; migration 0008's equivalent
+   ALTER VIEW was run manually and verified (`security_invoker=true`). The
+   function inventory matched expected_function_inventory.psv
    (<yes / paste the mismatch if no>).
 3. Username + password auth configured (Email provider ON, both
    confirmations OFF, anonymous ON, everything else OFF). The hosted
