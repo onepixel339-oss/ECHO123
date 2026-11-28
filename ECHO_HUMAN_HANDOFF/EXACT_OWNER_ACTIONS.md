@@ -52,11 +52,11 @@ Follow `GITHUB_MANUAL_IMPORT.md`. Short version:
 4. **Success check:** the Dashboard shows a healthy project with zero tables
    in Table Editor.
 
-## ACTION 4 — Apply the 8 migrations (5 min)
+## ACTION 4 — Apply the 9 migrations (5 min)
 
 1. **Dashboard:** SQL Editor → **New query**.
 2. Open `MIGRATIONS/0000_roles.sql`, copy its full contents, paste, **Run**.
-3. Repeat for `0001`, `0002`, `0003`, `0004`, `0005`, `0006`, `0007` **in
+3. Repeat for `0001`, `0002`, `0003`, `0004`, `0005`, `0006`, `0007`, `0008` **in
    that exact order** (each file says which number it is).
 4. **Success check (paste and Run):**
    ```sql
@@ -68,6 +68,13 @@ Follow `GITHUB_MANUAL_IMPORT.md`. Short version:
    and `owner = postgres`; the three `echo_jobs.sync_job_*` rows show
    `security_definer = true` and `owner = echo_jobs_admin`. Then compare the
    full output to `expected_function_inventory.psv` — it must match exactly.
+   Also verify the inventory view itself uses caller permissions:
+   ```sql
+   select reloptions
+     from pg_class
+    where oid = 'public.v_sync_function_inventory'::regclass;
+   ```
+   The returned options must include `security_invoker=true`.
 
 ## ACTION 5 — Turn on username + password auth (5 min)
 
