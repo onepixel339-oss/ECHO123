@@ -11,7 +11,7 @@
 
 ## Applying the migrations
 
-The 8 files in `MIGRATIONS/` run **in numeric order** via the SQL Editor
+The 9 files in `MIGRATIONS/` run **in numeric order** via the SQL Editor
 (ACTION 2), or, if you prefer the CLI:
 
 ```bash
@@ -33,6 +33,7 @@ What they build (one line each):
 | 0005 | jobs.sql | The S-2 SECURITY DEFINER jobs (compact/cleanup/reset) owned by `echo_jobs_admin` |
 | 0006 | views_assertions.sql | The lock-guard trigger, `security_invoker` views, EXECUTE default-deny, the ownership/shape assertions + inventory view |
 | 0007 | reason_constraint.sql | The §5.3.4 constraint migration (no-op on fresh DBs; corrects any v1.1-built environment) |
+| 0008 | inventory_view_security_invoker.sql | Sets `public.v_sync_function_inventory` to `security_invoker = true` so caller permissions and RLS apply |
 
 ## RLS verification (after applying)
 
@@ -42,8 +43,11 @@ What they build (one line each):
    ```
    → **15**.
 2. Table Editor: every `echo_data` table shows **RLS enabled**.
-3. The function inventory (ACTION 2's success check) matches
+3. The function inventory (ACTION 4's success check) matches
    `expected_function_inventory.psv` exactly.
+4. `public.v_sync_function_inventory` has `security_invoker=true` in its
+   `pg_class.reloptions`. If the equivalent ALTER VIEW was already run
+   manually on an existing project, verify the option instead of repeating it.
 
 ## Auth settings
 
